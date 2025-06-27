@@ -1,0 +1,137 @@
+---
+title: "How Movies and TV Shows Differ By Country"
+subtitle: "MATH 3570 Midterm Project"
+author: "Luke Syverud, Elizabeth Ruiz, Maxwell Creager-Roberts, Isaac Kujak, Kaia Lui"
+format: 
+  html:
+    toc: true
+execute: 
+  echo: true
+  eval: false
+editor: source
+---
+
+## Part 1: Downloading Libraries and Reading Data
+```{r}
+#| eval: true
+
+
+library(reticulate)
+library(tidyverse)
+library(ggplot2)
+
+```
+
+
+## Part 2: Generating the Charts
+```{r}
+#| eval: true
+
+# Most Common Movie Ratings in North America
+
+netflix <- readr::read_csv(file = "./netflix_titles.csv")
+
+netflix|>
+  filter(!grepl("TV", rating) & rating != "TV-Y7-FV" & rating != "NC-17" & rating != "84 min" & rating != "74 min" & rating != "66 min" & rating != "UR" & (country == "United States" | country == "Mexico" | country == "Canada") & type == "Movie") |>
+ggplot(mapping  = aes(x = rating, fill = rating)) +
+  geom_bar()+
+  labs(title = "Most Popular Movie Ratings in North America")+
+  ggthemes::theme_fivethirtyeight()
+
+```
+
+```{r}
+#| eval: true
+# Most Common TV Ratings in North America
+
+netflix|>
+  filter(rating != "TV-Y7-FV" & rating != "NR" & rating != "R" &rating != "84 min" & rating != "74 min" & rating != "66 min" & rating != "UR" & (is.element("United States", country) | is.element("Mexico", country) | is.element("Canada", country)) & type == "TV Show") |>
+ggplot(mapping  = aes(x = rating, fill = rating)) +
+  geom_bar()+
+  labs(title = "Most Popular TV Ratings in North America")+
+  ggthemes::theme_fivethirtyeight()
+```
+
+```{r}
+#| eval: true
+# Most Common TV Ratings in Asia
+
+netflix|>
+  filter(rating != "NR" & rating != "R" & rating != "TV-Y7-FV" & rating != "NA" & (country == "India" | country == "Japan" | country == "South Korea") & type == "TV Show") |>
+ggplot(mapping  = aes(x = rating, fill = rating)) +
+  geom_bar()+
+  labs(title = "Most Popular TV Ratings in Asia")+
+  ggthemes::theme_fivethirtyeight()
+```
+
+```{r}
+#| eval: true
+# Most Common Movie Ratings in Asia
+
+netflix|>
+  filter(!grepl('TV', rating) & rating != "84 min" & rating != "74 min" & rating != "66 min" & rating != "UR" & rating != "NC-17" & rating != "TV-Y7-FV" & rating != "NA" & (is.element("India", country) | is.element("Japan", country) | is.element("South Korea", country)) & type == "Movie") |>
+ggplot(mapping  = aes(x = rating, fill = rating)) +
+  geom_bar()+
+  labs(title = "Most Popular Movie Ratings in Asia")+
+  ggthemes::theme_fivethirtyeight()
+```
+
+```{r}
+#| eval: true
+#TV show duration in the US
+
+netflix|>
+  filter((country == "United States" | country == "Mexico" | country == "Canada") & type=="TV Show") |> mutate(duration=parse_number(duration)) |>
+  ggplot(mapping=aes(x=duration, fill = factor(duration))) +
+  geom_bar()+
+  scale_fill_discrete(name = "Duration")+
+  labs(title="Popular Number of TV Show Seasons in North America", x="Amount of Seasons", y="Count")+
+  ggthemes::theme_fivethirtyeight()
+
+
+```
+
+
+```{r}
+#| eval: true
+#TV show duration in Asia
+
+graph <- netflix|>
+  filter((country == "India" | country == "South Korea" | country == "Japan") & type=="TV Show") |> mutate(duration=parse_number(duration)) |>
+  ggplot(mapping=aes(x=duration, fill=factor(duration))) +
+  geom_bar()+
+  scale_fill_discrete(name = "Duration")+
+  labs(title="Popular Number of TV Show Seasons in Asia", x="Amount of Seasons", y="Count")
+
+graph + ggthemes::theme_fivethirtyeight()
+```
+
+```{r}
+#| eval: true
+#Amount of movies produced from 2010-present in North America
+
+netflix|>
+  filter((is.element("United States", country) | is.element("Canada", country) | is.element("Mexico", country)) & type=="Movie" & release_year>=2010) |>
+  ggplot(mapping=aes(x=factor(release_year))) +
+  geom_bar(fill="blue")+
+  labs(title = "Popular Years Movies Were Released in North America", x="Years", y="Count") +
+  ggthemes::theme_fivethirtyeight()
+
+```
+
+
+```{r}
+#| eval: true
+#Amount of movies produced from 2010-present in Asia
+
+netflix|>
+  filter((country == "India" | country == "South Korea" | country == "Japan") & type=="Movie" & release_year>=2010) |>
+  ggplot(mapping=aes(x=factor(release_year))) +
+  geom_bar(fill="purple")+
+  labs(title = "Popular Years Movies Were Released in Asia", x="Years", y="Count")+
+  ggthemes::theme_fivethirtyeight()
+
+
+
+```
+
